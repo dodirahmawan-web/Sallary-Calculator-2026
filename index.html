@@ -11,288 +11,194 @@
             0% { opacity: 0; transform: translateY(20px) scale(0.95); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .animate-slide-up {
-            animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        /* Custom Scrollbar for dropdowns if needed */
+        .animate-slide-up { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #1e293b; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-gray-800 to-slate-900 flex items-center justify-center min-h-screen p-4 font-sans selection:bg-emerald-500/30 text-slate-200">
+<body class="bg-gradient-to-br from-slate-900 via-gray-800 to-slate-900 min-h-screen p-4 font-sans text-slate-200">
 
-    <!-- Card Container -->
-    <div class="relative bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-emerald-900/20 w-full max-w-md p-6 sm:p-8 border border-slate-700/50">
+    <div class="max-w-md mx-auto bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 p-6 sm:p-8">
         
-        <!-- Decoration Glow -->
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none"></div>
-        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none"></div>
-
-        <h2 class="relative text-2xl font-extrabold text-center mb-6 pb-4 border-b border-slate-700/80 tracking-wide">
-            <i class="fas fa-wallet text-emerald-400 mr-2"></i>
-            <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
-                Simulasi Gaji LSI 2026
-            </span>
+        <h2 class="text-2xl font-extrabold text-center mb-6 pb-4 border-b border-slate-700/80 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+            Simulasi Gaji 2026
         </h2>
         
-        <div class="space-y-4 relative z-10">
-            <!-- Gaji Saat Ini -->
+        <div class="space-y-4">
+            <!-- Pilihan Tipe Gaji -->
             <div>
-                <label for="gajiSekarang" class="block text-sm font-medium text-slate-300 mb-1.5">Gaji Saat Ini (Rp)</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 font-bold">
-                        Rp
-                    </div>
-                    <input type="text" id="gajiSekarang" placeholder="Contoh: 5000000" oninput="formatRupiahInput(this)"
-                           class="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all text-white font-medium placeholder-slate-500 shadow-inner">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Basis Gaji</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="btnUmp" onclick="toggleTipe('ump')" class="py-2 px-4 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-400 font-semibold transition-all">UMP Daerah</button>
+                    <button id="btnManual" onclick="toggleTipe('manual')" class="py-2 px-4 rounded-xl border border-slate-600 hover:border-slate-400 transition-all">Input Manual</button>
                 </div>
             </div>
 
-            <!-- Masa Kerja -->
+            <!-- Dropdown Daerah (Hanya muncul jika UMP) -->
+            <div id="sectionUmp" class="block">
+                <label for="pilihDaerah" class="block text-sm font-medium text-slate-300 mb-1.5">Pilih Provinsi</label>
+                <select id="pilihDaerah" onchange="updateUmpValue()" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white font-medium">
+                    <!-- Data UMP akan diisi JS -->
+                </select>
+                <p id="infoUmp" class="text-xs text-slate-500 mt-1 ml-1 font-mono">UMP Terpilih: -</p>
+            </div>
+
+            <!-- Input Manual (Hanya muncul jika Manual) -->
+            <div id="sectionManual" class="hidden">
+                <label for="gajiManual" class="block text-sm font-medium text-slate-300 mb-1.5">Masukkan Nominal Gaji (Rp)</label>
+                <input type="text" id="gajiManual" placeholder="Contoh: 5000000" oninput="formatRupiahInput(this)" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white font-medium">
+            </div>
+
+            <hr class="border-slate-700 my-4">
+
+            <!-- Data Pendukung Lain -->
             <div>
                 <label for="masaKerja" class="block text-sm font-medium text-slate-300 mb-1.5">Masa Kerja (Tahun)</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="fas fa-hourglass-half text-slate-500"></i>
-                    </div>
-                    <input type="number" id="masaKerja" value="10" min="1" max="50" 
-                           class="w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all text-white font-medium placeholder-slate-500 shadow-inner">
-                </div>
-                <p class="text-[10px] text-slate-500 mt-1 ml-1">*Senioritas hanya dihitung untuk Level 1-2 yang gajinya di bawah UMP.</p>
+                <input type="number" id="masaKerja" value="10" min="1" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white font-medium">
             </div>
 
-            <!-- Level Jabatan -->
             <div>
                 <label for="level" class="block text-sm font-medium text-slate-300 mb-1.5">Level Jabatan</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="fas fa-id-badge text-slate-500"></i>
-                    </div>
-                    <select id="level" class="w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all appearance-none text-white font-medium shadow-inner">
-                        <option value="12" class="bg-slate-800 text-white">Level 1 - 2</option>
-                        <option value="3" class="bg-slate-800 text-white">Level 3</option>
-                        <option value="4" class="bg-slate-800 text-white">Level 4</option>
-                        <option value="58" class="bg-slate-800 text-white">Level 5 - 8</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                        <i class="fas fa-chevron-down text-slate-400 text-xs"></i>
-                    </div>
-                </div>
+                <select id="level" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white font-medium">
+                    <option value="12">Level 1 - 2</option>
+                    <option value="3">Level 3</option>
+                    <option value="4">Level 4</option>
+                    <option value="58">Level 5 - 8 (No Kenaikan)</option>
+                </select>
             </div>
 
-            <!-- Nilai Kinerja (PA) -->
             <div>
                 <label for="pa" class="block text-sm font-medium text-slate-300 mb-1.5">Nilai Kinerja (PA)</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="fas fa-chart-pie text-slate-500"></i>
-                    </div>
-                    <select id="pa" class="w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all appearance-none text-white font-medium shadow-inner">
-                        <option value="A" class="bg-slate-800 text-white">A (Sangat Baik)</option>
-                        <option value="BC" selected class="bg-slate-800 text-white">B / C (Baik / Cukup)</option>
-                        <option value="D" class="bg-slate-800 text-white">D (Kurang)</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                        <i class="fas fa-chevron-down text-slate-400 text-xs"></i>
-                    </div>
-                </div>
+                <select id="pa" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white font-medium">
+                    <option value="A">A (Sangat Baik)</option>
+                    <option value="BC" selected>B / C (Baik / Cukup)</option>
+                    <option value="D">D (Kurang)</option>
+                </select>
             </div>
 
-            <!-- Button -->
-            <button onclick="hitungGaji()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 active:scale-[0.98] text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all duration-300 ease-in-out mt-4 border border-emerald-400/20">
+            <button onclick="hitungGaji()" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-xl hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all">
                 Kalkulasi Gaji
             </button>
         </div>
 
-        <!-- Result Box (Menjadi lebih dinamis) -->
-        <div id="resultBox" class="hidden mt-6 bg-slate-900/60 border border-slate-700/60 rounded-2xl p-5 shadow-inner relative overflow-hidden">
-            <!-- Decorative line -->
-            <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-cyan-500"></div>
-            
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 ml-2">Ringkasan Estimasi</h3>
-            
-            <div id="rincianKalkulasi" class="space-y-3.5 text-sm text-slate-300 ml-2">
-                <!-- Rincian akan di-inject lewat JavaScript -->
-            </div>
+        <!-- Result -->
+        <div id="resultBox" class="hidden mt-6 bg-slate-900/60 rounded-2xl p-5 border border-slate-700 text-sm">
+            <div id="rincianKalkulasi" class="space-y-3 text-slate-300"></div>
         </div>
     </div>
 
     <script>
-        // Nilai default UMP Jakarta 2026
-        const UMP = 5729876;
+        const UMP_DATA = {
+            "DKI Jakarta": 5729876,
+            "Jawa Barat": 2350000,
+            "Jawa Tengah": 2200000,
+            "Jawa Timur": 2400000,
+            "Banten": 2900000,
+            "DIY Yogyakarta": 2100000
+        };
 
-        function formatRupiah(angka) {
-            return "Rp " + Math.round(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
+        // Init Dropdown
+        const dropdown = document.getElementById('pilihDaerah');
+        Object.keys(UMP_DATA).forEach(prov => {
+            let opt = document.createElement('option');
+            opt.value = prov; opt.innerHTML = prov;
+            dropdown.appendChild(opt);
+        });
 
-        // Fungsi untuk memformat input Gaji Saat Ini secara otomatis (Ribuan)
-        function formatRupiahInput(input) {
-            let angka = input.value.replace(/[^,\d]/g, '').toString();
-            let split = angka.split(',');
-            let sisa = split[0].length % 3;
-            let rupiah = split[0].substr(0, sisa);
-            let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-            if (ribuan) {
-                let separator = sisa ? '.' : '';
-                rupiah += separator + ribuan.join('.');
+        function toggleTipe(tipe) {
+            if(tipe === 'ump') {
+                document.getElementById('sectionUmp').classList.remove('hidden');
+                document.getElementById('sectionManual').classList.add('hidden');
+                document.getElementById('btnUmp').className = "py-2 px-4 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-400 font-semibold";
+                document.getElementById('btnManual').className = "py-2 px-4 rounded-xl border border-slate-600 hover:border-slate-400";
+            } else {
+                document.getElementById('sectionUmp').classList.add('hidden');
+                document.getElementById('sectionManual').classList.remove('hidden');
+                document.getElementById('btnUmp').className = "py-2 px-4 rounded-xl border border-slate-600 hover:border-slate-400";
+                document.getElementById('btnManual').className = "py-2 px-4 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-400 font-semibold";
             }
-
-            rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-            input.value = rupiah;
         }
 
-        function getNilaiAngka(stringInput) {
-            if(!stringInput) return 0;
-            return parseInt(stringInput.replace(/[^0-9]/g, '')) || 0;
+        function formatRupiah(angka) { return "Rp " + Math.round(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+
+        function formatRupiahInput(input) {
+            let angka = input.value.replace(/[^,\d]/g, '');
+            input.value = angka.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
+
+        function updateUmpValue() {
+            let val = UMP_DATA[dropdown.value];
+            document.getElementById('infoUmp').innerText = "UMP Terpilih: " + formatRupiah(val);
+        }
+        
+        // Trigger awal
+        updateUmpValue();
 
         function hitungGaji() {
-            // Ambil Input
-            let gajiSekarangInput = document.getElementById('gajiSekarang').value;
-            let gajiSekarang = getNilaiAngka(gajiSekarangInput);
-            
-            let masaKerjaInput = document.getElementById('masaKerja');
-            let masaKerja = parseInt(masaKerjaInput.value);
-            if(isNaN(masaKerja) || masaKerja < 1) { masaKerja = 1; masaKerjaInput.value = 1; }
-            
+            let isUmp = !document.getElementById('sectionUmp').classList.contains('hidden');
+            let gajiDasar = 0;
+            let dasarPerhitungan = 0; // Untuk senioritas
+            let isLevel12 = document.getElementById('level').value === '12';
+
+            if(isUmp) {
+                dasarPerhitungan = UMP_DATA[dropdown.value];
+            } else {
+                dasarPerhitungan = parseInt(document.getElementById('gajiManual').value.replace(/\./g, '')) || 0;
+            }
+
+            let masaKerja = parseInt(document.getElementById('masaKerja').value);
             let level = document.getElementById('level').value;
             let pa = document.getElementById('pa').value;
 
-            const rincianDiv = document.getElementById('rincianKalkulasi');
-            rincianDiv.innerHTML = ''; // Clear previous results
-
-            // --- JIKA LEVEL 5-8 ---
-            if (level === "58") {
-                rincianDiv.innerHTML = `
-                    <div class="p-3 bg-red-900/30 border border-red-500/50 rounded-lg text-center">
-                        <p class="text-red-400 font-semibold mb-1"><i class="fas fa-exclamation-circle mr-1"></i> Perhatian</p>
-                        <p class="text-slate-300 text-xs">Sesuai aturan dokumen Poin 8(d), Level 5 - 8 <b>Tidak Ada Kenaikan Upah</b>.</p>
-                    </div>
-                `;
-                showResult();
-                return; // Stop perhitungan
+            // Logic Level 5-8
+            if(level === '58') {
+                document.getElementById('rincianKalkulasi').innerHTML = '<p class="text-red-400 text-center">Level 5-8: Tidak ada kenaikan.</p>';
+                document.getElementById('resultBox').classList.remove('hidden'); return;
             }
 
-            // Validasi Input Gaji
-            if (gajiSekarang === 0) {
-                alert("Mohon isi Gaji Saat Ini terlebih dahulu.");
-                return;
-            }
-
-            // Variabel Penampung
-            let totalSenioritas = 0;
             let pengali = 0;
-            let gajiDasarBaru = gajiSekarang; // Defaultnya adalah gaji saat ini
-            let infoSenioritas = "";
-            let infoPenyesuaian = "";
+            if(masaKerja >= 1 && masaKerja <= 5) pengali = 9000;
+            else if(masaKerja > 5 && masaKerja <= 10) pengali = 9500;
+            else if(masaKerja > 10 && masaKerja <= 15) pengali = 10000;
+            else if(masaKerja > 15 && masaKerja <= 20) pengali = 10500;
+            else if(masaKerja > 20 && masaKerja <= 25) pengali = 11000;
+            else if(masaKerja > 25 && masaKerja <= 30) pengali = 11500;
+            else if(masaKerja > 30) pengali = 12000;
 
-            // --- LOGIKA LEVEL 1 & 2 ---
-            if (level === "12") {
-                if (gajiSekarang < UMP) {
-                    // Kasus: Gaji di bawah UMP
-                    // Hitung Pengali Senioritas
-                    if(masaKerja >= 1 && masaKerja <= 5) pengali = 9000;
-                    else if(masaKerja > 5 && masaKerja <= 10) pengali = 9500;
-                    else if(masaKerja > 10 && masaKerja <= 15) pengali = 10000;
-                    else if(masaKerja > 15 && masaKerja <= 20) pengali = 10500;
-                    else if(masaKerja > 20 && masaKerja <= 25) pengali = 11000;
-                    else if(masaKerja > 25 && masaKerja <= 30) pengali = 11500;
-                    else if(masaKerja > 30) pengali = 12000;
-
-                    totalSenioritas = masaKerja * pengali;
-                    gajiDasarBaru = UMP + totalSenioritas; // Penyesuaian batas bawah
-                    
-                    infoPenyesuaian = `
-                        <div class="flex justify-between items-center border-b border-slate-700/50 pb-2">
-                            <span class="flex items-center"><i class="fas fa-arrow-up w-5 text-emerald-500 text-xs"></i> Penyesuaian UMP</span>
-                            <span class="font-medium text-slate-200">${formatRupiah(UMP)}</span>
-                        </div>
-                    `;
-                    infoSenioritas = `
-                        <div class="flex justify-between items-center border-b border-slate-700/50 pb-2">
-                            <span class="flex items-center"><i class="fas fa-layer-group w-5 text-amber-500/80 text-xs"></i> Senioritas</span>
-                            <div class="text-right">
-                                <span class="font-medium text-amber-400 block">+ ${formatRupiah(totalSenioritas)}</span>
-                                <span class="text-[10px] text-slate-500 block mt-0.5">${masaKerja} thn × ${formatRupiah(pengali)}</span>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    // Kasus: Gaji di atas/sama dengan UMP
-                    infoPenyesuaian = `
-                        <div class="flex justify-between items-center border-b border-slate-700/50 pb-2">
-                            <span class="flex items-center"><i class="fas fa-check w-5 text-emerald-500 text-xs"></i> Status Upah</span>
-                            <span class="text-[11px] text-emerald-400 bg-emerald-900/40 px-2 py-0.5 rounded border border-emerald-700/50">Di Atas UMP (Tanpa Senioritas)</span>
-                        </div>
-                    `;
-                }
-            } 
-            // --- LOGIKA LEVEL 3 & 4 ---
-            else {
-                // Dokumen tidak menyebutkan penyesuaian UMP+Senioritas untuk Lv 3-4, 
-                // hanya kenaikan PA berdasarkan rentang minimum (kita asumsikan dari gaji saat ini).
-                infoPenyesuaian = `
-                    <div class="flex justify-between items-center border-b border-slate-700/50 pb-2">
-                        <span class="flex items-center"><i class="fas fa-check w-5 text-emerald-500 text-xs"></i> Status Upah</span>
-                        <span class="text-[11px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Disesuaikan berdasarkan Gaji Saat Ini</span>
-                    </div>
-                `;
+            let senioritas = isLevel12 ? (masaKerja * pengali) : 0;
+            
+            // Logic: Jika L1-2, dan pakai UMP/Gaji < UMP, maka gunakan batas UMP + Senioritas
+            if(isLevel12 && dasarPerhitungan < (isUmp ? dasarPerhitungan : 5729876)) {
+                gajiDasar = (isUmp ? dasarPerhitungan : 5729876) + senioritas;
+            } else {
+                gajiDasar = dasarPerhitungan;
             }
 
-            // --- HITUNG PERSEN PA ---
             let persen = 0;
             if(level === "12" || level === "3") {
-                if(pa === "A") persen = 0.0098;
-                else if(pa === "BC") persen = 0.0083;
-                else if(pa === "D") persen = 0.0069;
-            } else if(level === "4") {
-                if(pa === "A") persen = 0.0069;
-                else if(pa === "BC") persen = 0.0054;
-                else if(pa === "D") persen = 0.0039;
+                if(pa === "A") persen = 0.0098; else if(pa === "BC") persen = 0.0083; else persen = 0.0069;
+            } else {
+                if(pa === "A") persen = 0.0069; else if(pa === "BC") persen = 0.0054; else persen = 0.0039;
             }
 
-            // --- FINAL CALCULATION ---
-            let kenaikanPA = gajiDasarBaru * persen;
-            let totalGajiAkhir = gajiDasarBaru + kenaikanPA;
+            let kenaikanPA = gajiDasar * persen;
+            let total = gajiDasar + kenaikanPA;
 
-            // --- BUILD UI ---
-            let htmlResult = `
-                <div class="flex justify-between items-center border-b border-slate-700/50 pb-2">
-                    <span class="flex items-center"><i class="fas fa-wallet w-5 text-slate-500 text-xs"></i> Gaji Saat Ini</span>
-                    <span class="font-medium text-slate-400 line-through decoration-slate-500">${formatRupiah(gajiSekarang)}</span>
-                </div>
-                ${infoPenyesuaian}
-                ${infoSenioritas}
-                <div class="flex justify-between items-center border-b border-slate-700/50 pb-2 bg-slate-800/40 p-2 -mx-2 px-2 rounded-lg">
-                    <span class="font-medium text-slate-300">Gaji Dasar Baru</span>
-                    <span class="font-semibold text-slate-100">${formatRupiah(gajiDasarBaru)}</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-slate-700/50 pb-2">
-                    <span class="flex items-center"><i class="fas fa-arrow-trend-up w-5 text-cyan-400 text-xs"></i> Performa (PA)</span>
-                    <div class="text-right">
-                        <span class="font-medium text-cyan-400 block">+ ${formatRupiah(kenaikanPA)}</span>
-                        <span class="text-[10px] text-slate-500 block mt-0.5">${(persen * 100).toFixed(2)}% dari Gaji Dasar Baru</span>
-                    </div>
-                </div>
-                <div class="flex justify-between items-center pt-3 mt-2">
-                    <span class="font-bold text-slate-200 text-base">Total Gaji Akhir</span>
-                    <span class="font-bold text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300 drop-shadow-md">${formatRupiah(totalGajiAkhir)}</span>
-                </div>
+            document.getElementById('rincianKalkulasi').innerHTML = `
+                <div class="flex justify-between"><span>Gaji Dasar:</span><span class="font-bold">${formatRupiah(gajiDasar)}</span></div>
+                <div class="flex justify-between text-emerald-400"><span>Kenaikan PA (${(persen*100).toFixed(2)}%):</span><span>+${formatRupiah(kenaikanPA)}</span></div>
+                <div class="border-t border-slate-700 pt-2 flex justify-between text-lg font-bold"><span>Total Akhir:</span><span class="text-white">${formatRupiah(total)}</span></div>
             `;
-
-            rincianDiv.innerHTML = htmlResult;
-            showResult();
-        }
-
-        function showResult() {
-            const resultBox = document.getElementById('resultBox');
-            resultBox.classList.remove('hidden', 'animate-slide-up');
-            void resultBox.offsetWidth; // trigger reflow
-            resultBox.classList.add('animate-slide-up');
+            document.getElementById('resultBox').classList.remove('hidden');
         }
     </script>
 </body>
 </html>
+```
+
+**Cara Update:**
+1. Hapus file `index.html` yang lama di GitHub Anda (atau langsung edit file tersebut).
+2. Salin kode baru di atas.
+3. *Commit changes*.
+4. Tunggu 2 menit, lalu buka link web Anda menggunakan **Incognito/Private Tab** di browser HP Anda.
