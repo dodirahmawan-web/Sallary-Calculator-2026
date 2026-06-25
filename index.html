@@ -7,130 +7,94 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @keyframes slideUpFade {
-            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .animate-slide-up { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        @keyframes slideUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-gray-800 to-slate-900 min-h-screen p-4 font-sans text-slate-200">
+<body class="bg-slate-900 min-h-screen text-slate-200 p-4 font-sans">
 
-    <div class="max-w-md mx-auto bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 p-6 sm:p-8">
-        
-        <h2 class="text-2xl font-extrabold text-center mb-6 pb-4 border-b border-slate-700/80 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+    <div class="max-w-md mx-auto bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700 p-6 sm:p-8">
+        <h2 class="text-2xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mb-6 border-b border-slate-700 pb-4">
             Simulasi Gaji LSI 2026
         </h2>
         
         <div class="space-y-4">
-            <!-- Pilihan Tipe Gaji -->
+            <!-- Pilihan Basis Gaji -->
             <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">Basis Gaji</label>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Metode Perhitungan</label>
                 <div class="grid grid-cols-2 gap-2">
-                    <button id="btnUmp" onclick="toggleTipe('ump')" class="py-2 px-4 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-400 font-semibold transition-all">UMP Daerah</button>
+                    <button id="btnUmp" onclick="toggleTipe('ump')" class="py-2 px-4 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-400 font-semibold transition-all">UMP Provinsi</button>
                     <button id="btnManual" onclick="toggleTipe('manual')" class="py-2 px-4 rounded-xl border border-slate-600 hover:border-slate-400 transition-all">Input Manual</button>
                 </div>
             </div>
 
-            <!-- Dropdown Daerah (Hanya muncul jika UMP) -->
-            <div id="sectionUmp" class="block">
-                <label for="pilihDaerah" class="block text-sm font-medium text-slate-300 mb-1.5">Pilih Provinsi</label>
-                <select id="pilihDaerah" onchange="updateUmpValue()" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white font-medium">
-                    <!-- Data UMP akan diisi JS -->
+            <!-- Dropdown Daerah -->
+            <div id="sectionUmp">
+                <label class="block text-sm font-medium text-slate-300 mb-1">Pilih Provinsi</label>
+                <select id="pilihDaerah" onchange="hitungGaji()" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white">
+                    <!-- Data akan diisi JS -->
                 </select>
-                <p id="infoUmp" class="text-xs text-slate-500 mt-1 ml-1 font-mono">UMP Terpilih: -</p>
             </div>
 
-            <!-- Input Manual (Hanya muncul jika Manual) -->
+            <!-- Input Manual -->
             <div id="sectionManual" class="hidden">
-                <label for="gajiManual" class="block text-sm font-medium text-slate-300 mb-1.5">Masukkan Nominal Gaji (Rp)</label>
-                <input type="text" id="gajiManual" placeholder="Contoh: 5000000" oninput="formatRupiahInput(this)" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white font-medium">
+                <label class="block text-sm font-medium text-slate-300 mb-1">Masukkan Gaji Sekarang (Rp)</label>
+                <input type="number" id="gajiManual" oninput="hitungGaji()" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white">
             </div>
 
-            <hr class="border-slate-700 my-4">
-
-            <!-- Data Pendukung Lain -->
+            <!-- Input Umum -->
             <div>
-                <label for="masaKerja" class="block text-sm font-medium text-slate-300 mb-1.5">Masa Kerja (Tahun)</label>
-                <input type="number" id="masaKerja" value="10" min="1" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white font-medium">
+                <label class="block text-sm font-medium text-slate-300 mb-1">Masa Kerja (Tahun)</label>
+                <input type="number" id="masaKerja" value="10" oninput="hitungGaji()" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white">
             </div>
 
             <div>
-                <label for="level" class="block text-sm font-medium text-slate-300 mb-1.5">Level Jabatan</label>
-                <select id="level" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white font-medium">
-                    <option value="12">Level 1 - 2</option>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Level Jabatan</label>
+                <select id="level" onchange="hitungGaji()" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white">
+                    <option value="1">Level 1</option>
+                    <option value="2">Level 2</option>
                     <option value="3">Level 3</option>
                     <option value="4">Level 4</option>
-                    <option value="58">Level 5 - 8 (No Kenaikan)</option>
+                    <option value="58">Level 5 - 8</option>
                 </select>
             </div>
 
             <div>
-                <label for="pa" class="block text-sm font-medium text-slate-300 mb-1.5">Nilai Kinerja (PA)</label>
-                <select id="pa" class="w-full p-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white font-medium">
+                <label class="block text-sm font-medium text-slate-300 mb-1">Tunjangan Transport (Rp)</label>
+                <input type="number" id="transport" value="0" oninput="hitungGaji()" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Nilai Kinerja (PA)</label>
+                <select id="pa" onchange="hitungGaji()" class="w-full p-3 bg-slate-900 border border-slate-600 rounded-xl text-white">
                     <option value="A">A (Sangat Baik)</option>
                     <option value="BC" selected>B / C (Baik / Cukup)</option>
                     <option value="D">D (Kurang)</option>
                 </select>
             </div>
-
-            <button onclick="hitungGaji()" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-xl hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all">
-                Kalkulasi Gaji
-            </button>
         </div>
 
         <!-- Result -->
-        <div id="resultBox" class="hidden mt-6 bg-slate-900/60 rounded-2xl p-5 border border-slate-700 text-sm">
-            <div id="rincianKalkulasi" class="space-y-3 text-slate-300"></div>
+        <div id="resultBox" class="mt-6 p-4 bg-slate-900 rounded-2xl border border-slate-700 hidden animate-slide-up">
+            <div id="rincianKalkulasi" class="space-y-2 text-sm text-slate-300"></div>
         </div>
     </div>
 
     <script>
         const UMP_DATA = {
-    "Aceh": 3685616,
-    "Sumatera Utara": 3228949,
-    "Sumatera Barat": 3182955,
-    "Riau": 3780495,
-    "Kepulauan Riau": 3879520,
-    "Jambi": 3471497,
-    "Bengkulu": 2827250,
-    "Sumatera Selatan": 3942963,
-    "Lampung": 3047734,
-    "Bangka Belitung": 4035000,
-    "DKI Jakarta": 5729876,
-    "Jawa Barat": 2317601,
-    "Jawa Tengah": 2327386,
-    "DI Yogyakarta": 2417495,
-    "Jawa Timur": 2446880,
-    "Banten": 3100881,
-    "Bali": 3207459,
-    "Nusa Tenggara Barat": 2673861,
-    "Nusa Tenggara Timur": 2455898,
-    "Kalimantan Barat": 3054552,
-    "Kalimantan Tengah": 3686138,
-    "Kalimantan Selatan": 3725000,
-    "Kalimantan Timur": 3762431,
-    "Kalimantan Utara": 3775243,
-    "Sulawesi Utara": 4002630,
-    "Sulawesi Tengah": 3179565,
-    "Sulawesi Selatan": 3921088,
-    "Sulawesi Tenggara": 3306496,
-    "Sulawesi Barat": 3315934,
-    "Gorontalo": 3405144,
-    "Maluku": 3334490,
-    "Maluku Utara": 3552840,
-    "Papua": 4436283,
-    "Papua Barat": 3841000,
-    "Papua Tengah": 4285848,
-    "Papua Pegunungan": 4508714,
-    "Papua Selatan": 4508850,
-    "Papua Barat Daya": 3766000,
+            "Aceh": 3685616, "Sumatera Utara": 3228949, "Sumatera Barat": 3182955, "Riau": 3780495,
+            "Kepulauan Riau": 3879520, "Jambi": 3471497, "Bengkulu": 2827250, "Sumatera Selatan": 3942963,
+            "Lampung": 3047734, "Bangka Belitung": 4035000, "DKI Jakarta": 5729876, "Jawa Barat": 2317601,
+            "Jawa Tengah": 2327386, "DI Yogyakarta": 2417495, "Jawa Timur": 2446880, "Banten": 3100881,
+            "Bali": 3207459, "Nusa Tenggara Barat": 2673861, "Nusa Tenggara Timur": 2455898, "Kalimantan Barat": 3054552,
+            "Kalimantan Tengah": 3686138, "Kalimantan Selatan": 3725000, "Kalimantan Timur": 3762431,
+            "Kalimantan Utara": 3775243, "Sulawesi Utara": 4002630, "Sulawesi Tengah": 3179565,
+            "Sulawesi Selatan": 3921088, "Sulawesi Tenggara": 3306496, "Sulawesi Barat": 3315934,
+            "Gorontalo": 3405144, "Maluku": 3334490, "Maluku Utara": 3552840, "Papua": 4436283,
+            "Papua Barat": 3841000, "Papua Tengah": 4285848, "Papua Pegunungan": 4508714,
+            "Papua Selatan": 4508850, "Papua Barat Daya": 3766000
         };
 
-        // Init Dropdown
         const dropdown = document.getElementById('pilihDaerah');
         Object.keys(UMP_DATA).forEach(prov => {
             let opt = document.createElement('option');
@@ -150,81 +114,71 @@
                 document.getElementById('btnUmp').className = "py-2 px-4 rounded-xl border border-slate-600 hover:border-slate-400";
                 document.getElementById('btnManual').className = "py-2 px-4 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-400 font-semibold";
             }
+            hitungGaji();
         }
 
         function formatRupiah(angka) { return "Rp " + Math.round(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
 
-        function formatRupiahInput(input) {
-            let angka = input.value.replace(/[^,\d]/g, '');
-            input.value = angka.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-
-        function updateUmpValue() {
-            let val = UMP_DATA[dropdown.value];
-            document.getElementById('infoUmp').innerText = "UMP Terpilih: " + formatRupiah(val);
-        }
-        
-        // Trigger awal
-        updateUmpValue();
-
         function hitungGaji() {
             let isUmp = !document.getElementById('sectionUmp').classList.contains('hidden');
-            let gajiDasar = 0;
-            let dasarPerhitungan = 0; // Untuk senioritas
-            let isLevel12 = document.getElementById('level').value === '12';
-
-            if(isUmp) {
-                dasarPerhitungan = UMP_DATA[dropdown.value];
-            } else {
-                dasarPerhitungan = parseInt(document.getElementById('gajiManual').value.replace(/\./g, '')) || 0;
-            }
-
-            let masaKerja = parseInt(document.getElementById('masaKerja').value);
+            let gajiSekarang = isUmp ? UMP_DATA[dropdown.value] : (parseInt(document.getElementById('gajiManual').value) || 0);
+            let masaKerja = parseInt(document.getElementById('masaKerja').value) || 0;
             let level = document.getElementById('level').value;
             let pa = document.getElementById('pa').value;
+            let transport = parseInt(document.getElementById('transport').value) || 0;
 
-            // Logic Level 5-8
+            document.getElementById('resultBox').classList.remove('hidden');
+
             if(level === '58') {
-                document.getElementById('rincianKalkulasi').innerHTML = '<p class="text-red-400 text-center">Level 5-8: Tidak ada kenaikan.</p>';
-                document.getElementById('resultBox').classList.remove('hidden'); return;
+                document.getElementById('rincianKalkulasi').innerHTML = '<p class="text-red-400 text-center font-bold">Level 5-8: Tidak ada kenaikan.</p>';
+                return;
             }
 
-            let pengali = 0;
-            if(masaKerja >= 1 && masaKerja <= 5) pengali = 9000;
-            else if(masaKerja > 5 && masaKerja <= 10) pengali = 9500;
-            else if(masaKerja > 10 && masaKerja <= 15) pengali = 10000;
-            else if(masaKerja > 15 && masaKerja <= 20) pengali = 10500;
-            else if(masaKerja > 20 && masaKerja <= 25) pengali = 11000;
-            else if(masaKerja > 25 && masaKerja <= 30) pengali = 11500;
-            else if(masaKerja > 30) pengali = 12000;
-
-            let senioritas = isLevel12 ? (masaKerja * pengali) : 0;
-            
-            // Logic: Jika L1-2, dan pakai UMP/Gaji < UMP, maka gunakan batas UMP + Senioritas
-            if(isLevel12 && dasarPerhitungan < (isUmp ? dasarPerhitungan : 5729876)) {
-                gajiDasar = (isUmp ? dasarPerhitungan : 5729876) + senioritas;
-            } else {
-                gajiDasar = dasarPerhitungan;
+            // Hitung Senioritas (Hanya untuk Level 1 & 2)
+            let senioritas = 0;
+            if(level === '1' || level === '2') {
+                let pengali = 0;
+                if(masaKerja >= 1 && masaKerja <= 5) pengali = 9000;
+                else if(masaKerja > 5 && masaKerja <= 10) pengali = 9500;
+                else if(masaKerja > 10 && masaKerja <= 15) pengali = 10000;
+                else if(masaKerja > 15 && masaKerja <= 20) pengali = 10500;
+                else if(masaKerja > 20 && masaKerja <= 25) pengali = 11000;
+                else if(masaKerja > 25 && masaKerja <= 30) pengali = 11500;
+                else if(masaKerja > 30) pengali = 12000;
+                senioritas = masaKerja * pengali;
             }
 
+            // Gaji Dasar (Jika < UMP, disesuaikan)
+            let dasar = gajiSekarang;
+            let info = "";
+            if((level === '1' || level === '2') && gajiSekarang < UMP_DATA["DKI Jakarta"]) {
+                 dasar = UMP_DATA["DKI Jakarta"] + senioritas;
+                 info = `<div class="text-xs text-emerald-400 mb-2">Gaji disesuaikan ke UMP + Senioritas</div>`;
+            }
+
+            // Persen PA - Dipisah untuk setiap level agar mudah diatur di masa depan
             let persen = 0;
-            if(level === "12" || level === "3") {
+            if(level === '1') {
                 if(pa === "A") persen = 0.0098; else if(pa === "BC") persen = 0.0083; else persen = 0.0069;
-            } else {
+            } else if(level === '2') {
+                if(pa === "A") persen = 0.0098; else if(pa === "BC") persen = 0.0083; else persen = 0.0069;
+            } else if(level === '3') {
+                if(pa === "A") persen = 0.0098; else if(pa === "BC") persen = 0.0083; else persen = 0.0069;
+            } else if(level === '4') {
                 if(pa === "A") persen = 0.0069; else if(pa === "BC") persen = 0.0054; else persen = 0.0039;
             }
 
-            let kenaikanPA = gajiDasar * persen;
-            let total = gajiDasar + kenaikanPA;
+            let naikPA = dasar * persen;
+            let total = dasar + naikPA + transport;
 
             document.getElementById('rincianKalkulasi').innerHTML = `
-                <div class="flex justify-between"><span>Gaji Dasar:</span><span class="font-bold">${formatRupiah(gajiDasar)}</span></div>
-                <div class="flex justify-between text-emerald-400"><span>Kenaikan PA (${(persen*100).toFixed(2)}%):</span><span>+${formatRupiah(kenaikanPA)}</span></div>
+                ${info}
+                <div class="flex justify-between"><span>Gaji Dasar:</span><span class="font-bold">${formatRupiah(dasar)}</span></div>
+                <div class="flex justify-between text-emerald-400"><span>Kenaikan PA:</span><span>+${formatRupiah(naikPA)}</span></div>
+                <div class="flex justify-between text-cyan-400"><span>Transport:</span><span>+${formatRupiah(transport)}</span></div>
                 <div class="border-t border-slate-700 pt-2 flex justify-between text-lg font-bold"><span>Total Akhir:</span><span class="text-white">${formatRupiah(total)}</span></div>
             `;
-            document.getElementById('resultBox').classList.remove('hidden');
         }
     </script>
 </body>
 </html>
-```
