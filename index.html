@@ -11,29 +11,39 @@
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200 min-h-screen p-4 md:p-8">
+<body class="bg-slate-900 text-slate-200 min-h-screen p-4 md:p-8 font-sans">
 
-    <div class="max-w-xl mx-auto bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-700">
+    <div class="max-w-2xl mx-auto bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-700">
         <h2 class="text-2xl font-bold text-emerald-400 mb-6 border-b border-slate-700 pb-4 text-center">
-            <i class="fas fa-file-invoice-dollar mr-2"></i>Simulasi Upah 2026
+            <i class="fas fa-file-invoice-dollar mr-2"></i>Simulasi Penyesuaian Upah 2026
         </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-slate-900/50 p-4 rounded-xl border border-slate-700">
+        <!-- Checkboxes Kondisi Khusus -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6 bg-slate-900/50 p-4 rounded-xl border border-slate-700">
             <label class="flex items-center space-x-3 cursor-pointer text-sm">
-                <input type="checkbox" id="isFraud" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500">
+                <input type="checkbox" id="isFraud" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500 focus:ring-emerald-500">
                 <span>Terlibat Fraud (2025/2026)</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer text-sm">
-                <input type="checkbox" id="isHO" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500">
-                <span>Karyawan Kantor Pusat (HO)</span>
+                <input type="checkbox" id="isJoinedBefore2025" checked class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500 focus:ring-emerald-500">
+                <span>Join sebelum 1 Jan 2025 (>12 Bln)</span>
             </label>
             <label class="flex items-center space-x-3 cursor-pointer text-sm">
-                <input type="checkbox" id="isJoinedBefore2025" checked class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500">
-                <span>Join sebelum 1 Jan 2025</span>
+                <input type="checkbox" id="isResignMay" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500 focus:ring-emerald-500">
+                <span>Hari Kerja Terakhir 31 Mei 2026</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer text-sm">
+                <input type="checkbox" id="isPromoted" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500 focus:ring-emerald-500">
+                <span>Promosi / Disesuaikan di 2026</span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer text-sm md:col-span-2 border-t border-slate-700 mt-2 pt-3">
+                <input type="checkbox" id="isHO" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500 focus:ring-emerald-500">
+                <span class="font-semibold text-emerald-300">Karyawan Kantor Pusat (HO)</span>
             </label>
         </div>
 
-        <div class="grid grid-cols-1 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Level & Status -->
             <div>
                 <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Level Jabatan</label>
                 <select id="level" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white focus:ring-2 focus:ring-emerald-500 outline-none">
@@ -44,109 +54,374 @@
                     <option value="58">Level 5 - 8</option>
                 </select>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Gaji Sekarang (Rp)</label>
-                    <input type="number" id="gajiSekarang" placeholder="5729876" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Masa Kerja (Thn)</label>
-                    <input type="number" id="masaKerja" value="1" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white">
+            
+            <div id="divStatus">
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Status Karyawan</label>
+                <select id="statusKaryawan" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <option value="P">Permanent (P)</option>
+                    <option value="C">Contract (C)</option>
+                </select>
+            </div>
+
+            <!-- Metode Penentuan Gaji -->
+            <div class="md:col-span-2 bg-slate-900/30 p-3 rounded-xl border border-slate-700/50">
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Acuan Gaji Sekarang</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <label class="flex items-center space-x-2 cursor-pointer bg-slate-700/50 p-2.5 rounded-lg border border-slate-600 hover:border-emerald-500 transition-all">
+                        <input type="radio" name="gajiType" value="ump" checked class="w-4 h-4 text-emerald-500 focus:ring-emerald-500">
+                        <span class="text-sm">Sesuai UMP Daerah</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer bg-slate-700/50 p-2.5 rounded-lg border border-slate-600 hover:border-emerald-500 transition-all">
+                        <input type="radio" name="gajiType" value="manual" class="w-4 h-4 text-emerald-500 focus:ring-emerald-500">
+                        <span class="text-sm">Input Manual</span>
+                    </label>
                 </div>
             </div>
+
+            <!-- Pilih Provinsi -->
+            <div class="md:col-span-2" id="divProvinsi">
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Pilih Provinsi / Wilayah</label>
+                <select id="provinsi" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <option value="5729876" selected>DKI Jakarta (Rp 5.729.876)</option>
+                    <option value="3460672">Aceh (Rp 3.460.672)</option>
+                    <option value="2809915">Sumatera Utara (Rp 2.809.915)</option>
+                    <option value="2811500">Sumatera Barat (Rp 2.811.500)</option>
+                    <option value="3294625">Riau (Rp 3.294.625)</option>
+                    <option value="3402492">Kepulauan Riau (Rp 3.402.492)</option>
+                    <option value="3137300">Jambi (Rp 3.137.300)</option>
+                    <option value="3456874">Sumatera Selatan (Rp 3.456.874)</option>
+                    <option value="3640000">Bangka Belitung (Rp 3.640.000)</option>
+                    <option value="2507079">Bengkulu (Rp 2.507.079)</option>
+                    <option value="2716166">Lampung (Rp 2.716.166)</option>
+                    <option value="2057495">Jawa Barat (Rp 2.057.495)</option>
+                    <option value="2036947">Jawa Tengah (Rp 2.036.947)</option>
+                    <option value="2125897">DI Yogyakarta (Rp 2.125.897)</option>
+                    <option value="2165244">Jawa Timur (Rp 2.165.244)</option>
+                    <option value="2727812">Banten (Rp 2.727.812)</option>
+                    <option value="2813672">Bali (Rp 2.813.672)</option>
+                    <option value="2444067">Nusa Tenggara Barat (Rp 2.444.067)</option>
+                    <option value="2186826">Nusa Tenggara Timur (Rp 2.186.826)</option>
+                    <option value="2702616">Kalimantan Barat (Rp 2.702.616)</option>
+                    <option value="3222925">Kalimantan Tengah (Rp 3.222.925)</option>
+                    <option value="3282812">Kalimantan Selatan (Rp 3.282.812)</option>
+                    <option value="3360858">Kalimantan Timur (Rp 3.360.858)</option>
+                    <option value="3361653">Kalimantan Utara (Rp 3.361.653)</option>
+                    <option value="3545000">Sulawesi Utara (Rp 3.545.000)</option>
+                    <option value="2736698">Sulawesi Tengah (Rp 2.736.698)</option>
+                    <option value="3431862">Sulawesi Selatan (Rp 3.431.862)</option>
+                    <option value="2885964">Sulawesi Tenggara (Rp 2.885.964)</option>
+                    <option value="3025100">Gorontalo (Rp 3.025.100)</option>
+                    <option value="2914958">Sulawesi Barat (Rp 2.914.958)</option>
+                    <option value="2949953">Maluku (Rp 2.949.953)</option>
+                    <option value="3200000">Maluku Utara (Rp 3.200.000)</option>
+                    <option value="4024270">Papua (Rp 4.024.270)</option>
+                    <option value="3393000">Papua Barat (Rp 3.393.000)</option>
+                    <option value="4024270">Papua Tengah (Rp 4.024.270)</option>
+                    <option value="4024270">Papua Pegunungan (Rp 4.024.270)</option>
+                    <option value="4024270">Papua Selatan (Rp 4.024.270)</option>
+                    <option value="3393000">Papua Barat Daya (Rp 3.393.000)</option>
+                </select>
+            </div>
+
+            <!-- Gaji & Masa Kerja -->
             <div>
-                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Penilaian Kinerja (PA)</label>
-                <select id="pa" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white">
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Gaji Saat Ini (Rp)</label>
+                <input type="number" id="gajiSekarang" readonly class="w-full p-3 bg-slate-800 rounded-lg border border-slate-700 text-emerald-400 font-semibold cursor-not-allowed outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Masa Kerja (Tahun)</label>
+                <input type="number" id="masaKerja" value="1" min="1" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+
+            <!-- UMP & Rentang Minimum -->
+            <div>
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Standard UMP/UMK Wilayah (Rp)</label>
+                <input type="number" id="ump" readonly class="w-full p-3 bg-slate-800 rounded-lg border border-slate-700 text-slate-400 cursor-not-allowed outline-none">
+            </div>
+            
+            <div id="divRentangMin" style="display: none;">
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Rentang Minimum Jabatan (Rp)</label>
+                <input type="number" id="rentangMinimum" placeholder="Khusus Level 3-4" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+
+            <!-- PA -->
+            <div class="md:col-span-2">
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Hasil Penilaian Kinerja (PA)</label>
+                <select id="pa" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white focus:ring-2 focus:ring-emerald-500 outline-none">
                     <option value="A">Nilai A</option>
                     <option value="BC">Nilai B/C</option>
                     <option value="D">Nilai D</option>
                 </select>
             </div>
-            <button onclick="hitung()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-4 rounded-xl mt-2 transition-all">
-                Hitung Simulasi
-            </button>
         </div>
 
-        <div id="result" class="mt-8 p-6 bg-emerald-900/20 border border-emerald-500/30 rounded-2xl hidden animate-fade-in">
-            <h3 class="text-lg font-bold text-emerald-400 mb-4 border-b border-emerald-500/20 pb-2">Hasil Simulasi</h3>
-            <div id="rincian" class="space-y-3 text-sm"></div>
+        <button onclick="hitung()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-4 rounded-xl mt-6 transition-all shadow-lg hover:shadow-emerald-500/25">
+            <i class="fas fa-calculator mr-2"></i>Kalkulasi Penyesuaian Upah
+        </button>
+
+        <div id="result" class="mt-8 p-6 bg-slate-900 border-l-4 border-emerald-500 rounded-r-2xl shadow-inner hidden animate-fade-in">
+            <h3 class="text-lg font-bold text-emerald-400 mb-4 border-b border-slate-700 pb-2">Rincian Hasil Simulasi</h3>
+            <div id="rincian" class="space-y-4 text-sm"></div>
         </div>
     </div>
 
     <script>
-        const UMP_JAKARTA = 5729876;
-        
+        const provinsiSelect = document.getElementById('provinsi');
+        const gajiInput = document.getElementById('gajiSekarang');
+        const umpInput = document.getElementById('ump');
+        const levelSelect = document.getElementById('level');
+
+        // Fungsi Sync Nilai UMP ke Input Fields
+        function syncUMPValues() {
+            const selectedUMP = parseFloat(provinsiSelect.value);
+            const gajiType = document.querySelector('input[name="gajiType"]:checked').value;
+            
+            // Standard UMP selalu mengikuti daerah terpilih
+            umpInput.value = selectedUMP;
+            
+            // Jika memilih acuan UMP, gaji sekarang dikunci mengikuti nilai UMP tersebut
+            if (gajiType === 'ump') {
+                gajiInput.value = selectedUMP;
+                gajiInput.readOnly = true;
+                gajiInput.classList.remove('bg-slate-700', 'text-white');
+                gajiInput.classList.add('bg-slate-800', 'text-emerald-400', 'cursor-not-allowed');
+            } else {
+                gajiInput.readOnly = false;
+                gajiInput.classList.remove('bg-slate-800', 'text-emerald-400', 'cursor-not-allowed');
+                gajiInput.classList.add('bg-slate-700', 'text-white');
+            }
+        }
+
+        // Listener Tipe Acuan Gaji (Sesuai UMP vs Manual)
+        document.querySelectorAll('input[name="gajiType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'manual') {
+                    gajiInput.value = "";
+                    gajiInput.placeholder = "Masukkan nominal gaji Anda";
+                }
+                syncUMPValues();
+            });
+        });
+
+        // Listener Perubahan Provinsi
+        provinsiSelect.addEventListener('change', syncUMPValues);
+
+        // UI Logic Tampilan Level Jabatan
+        levelSelect.addEventListener('change', function() {
+            const lvl = this.value;
+            // Tampilkan Status (P/C) hanya untuk Level 1
+            document.getElementById('divStatus').style.display = (lvl === '1') ? 'block' : 'none';
+            // Tampilkan Rentang Minimum hanya untuk Level 3 & 4
+            document.getElementById('divRentangMin').style.display = (lvl === '3' || lvl === '4') ? 'block' : 'none';
+        });
+
+        // Inisialisasi awal saat halaman dimuat
+        window.onload = function() {
+            syncUMPValues();
+        };
+
         function formatRupiah(num) {
             return "Rp " + Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
         function hitung() {
+            // Ambil Input Values
             const isFraud = document.getElementById('isFraud').checked;
-            const isHO = document.getElementById('isHO').checked;
             const isJoinedBefore2025 = document.getElementById('isJoinedBefore2025').checked;
+            const isResignMay = document.getElementById('isResignMay').checked;
+            const isPromoted = document.getElementById('isPromoted').checked;
+            const isHO = document.getElementById('isHO').checked;
+            
             const level = document.getElementById('level').value;
-            const gajiLama = parseFloat(document.getElementById('gajiSekarang').value) || 0;
-            const masaKerja = parseInt(document.getElementById('masaKerja').value) || 0;
+            const statusKaryawan = document.getElementById('statusKaryawan').value;
             const pa = document.getElementById('pa').value;
+            const namaProvinsi = provinsiSelect.options[provinsiSelect.selectedIndex].text.split(" (")[0];
+            
+            const gajiLama = parseFloat(gajiInput.value) || 0;
+            const masaKerja = parseInt(document.getElementById('masaKerja').value) || 0;
+            const UMP = parseFloat(umpInput.value) || 5729876;
+            const rentangMin = parseFloat(document.getElementById('rentangMinimum').value) || UMP;
+
+            if (gajiLama <= 0) {
+                alert("Mohon masukkan nominal Gaji Saat Ini terlebih dahulu!");
+                return;
+            }
 
             const resDiv = document.getElementById('result');
             const rinDiv = document.getElementById('rincian');
             resDiv.classList.remove('hidden');
 
-            if(isFraud || !isJoinedBefore2025) {
-                rinDiv.innerHTML = `<p class="text-red-400 font-bold">Maaf, Anda tidak memenuhi syarat kenaikan (Fraud atau bergabung setelah 1 Jan 2025).</p>`;
-                return;
-            }
-
-            if(level === '58') {
-                rinDiv.innerHTML = `<p class="text-amber-400">Level 5-8: Tidak ada kenaikan.</p>`;
-                return;
-            }
-
-            let gajiBaru = gajiLama;
-            let info = "";
-
-            if(level === '1' || level === '2') {
-                let senioritas = 0;
-                if(masaKerja >= 1 && masaKerja <= 5) senioritas = 9000 * masaKerja;
-                else if(masaKerja > 5 && masaKerja <= 10) senioritas = 9500 * masaKerja;
-                else if(masaKerja > 10 && masaKerja <= 15) senioritas = 10000 * masaKerja;
-                else if(masaKerja > 15 && masaKerja <= 20) senioritas = 10500 * masaKerja;
-                else if(masaKerja > 20 && masaKerja <= 25) senioritas = 11000 * masaKerja;
-                else if(masaKerja > 25 && masaKerja <= 30) senioritas = 11500 * masaKerja;
-                else if(masaKerja > 30) senioritas = 12000 * masaKerja;
-
-                if(gajiLama < UMP_JAKARTA) {
-                    gajiBaru = UMP_JAKARTA + senioritas;
-                    info = "Penyesuaian ke UMP + Senioritas";
-                } else {
-                    let pct = (pa === 'A') ? 0.0098 : (pa === 'BC' ? 0.0083 : 0.0069);
-                    gajiBaru = gajiLama + (gajiLama * pct);
-                    info = "Kenaikan PA (di atas UMP)";
-                }
-            } else if(level === '3' || level === '4') {
-                if(isHO) {
-                    rinDiv.innerHTML = `<p class="text-red-400">Karyawan HO (Level 3-4) tidak mendapatkan kenaikan.</p>`;
-                    return;
-                }
-                let pct = (level === '3') ? (pa === 'A' ? 0.0098 : (pa === 'BC' ? 0.0083 : 0.0069)) 
-                                          : (pa === 'A' ? 0.0069 : (pa === 'BC' ? 0.0054 : 0.0039));
-                gajiBaru = gajiLama + (gajiLama * pct);
-                info = "Kenaikan PA";
-            }
-
+            // Cek Syarat Transport & Fraud
             let transport = (!isFraud) ? 10000 : 0;
-            let totalGajiBaru = gajiBaru + transport;
-            let selisih = totalGajiBaru - gajiLama;
-            let totalRapel = selisih * 7; 
+
+            // Pengecekan Syarat Dasar Pembatalan Kenaikan Upah Pokok
+            let alasanBatal = "";
+            if (isFraud) alasanBatal = "Terlibat kasus Fraud tahun 2025/2026.";
+            else if (!isJoinedBefore2025) alasanBatal = "Masa kerja kurang dari 12 bulan (Join > 01 Jan 2025).";
+            else if (isResignMay) alasanBatal = "Hari kerja terakhir adalah 31 Mei 2026.";
+            else if (isPromoted) alasanBatal = "Telah dipromosikan/disesuaikan upahnya di tahun 2026.";
+            else if (level === '58') alasanBatal = "Level 5 - 8 tidak ada kenaikan.";
+
+            if (alasanBatal !== "") {
+                rinDiv.innerHTML = `
+                    <div class="p-3 bg-red-900/30 border border-red-500/50 rounded text-red-200 mb-3">
+                        <i class="fas fa-exclamation-circle mr-2"></i>${alasanBatal}
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-700">
+                        <span class="text-slate-400">Gaji Pokok Baru:</span>
+                        <span class="font-bold text-white">${formatRupiah(gajiLama)} <span class="text-xs text-slate-500">(Tetap)</span></span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-700">
+                        <span class="text-slate-400">Penyesuaian Transport:</span>
+                        <span class="font-bold ${transport > 0 ? 'text-emerald-400' : 'text-slate-500'}">+${formatRupiah(transport)}</span>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-600">
+                        <p class="text-xs text-slate-400 mb-1">Total Rapel (Hanya Transport 6 Bulan):</p>
+                        <p class="text-xl font-bold text-emerald-400">${formatRupiah(transport * 6)}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Logic Persentase PA
+            let paPct = 0;
+            if (level === '1' || level === '2' || level === '3') {
+                if(pa === 'A') paPct = 0.0098;
+                else if(pa === 'BC') paPct = 0.0083;
+                else if(pa === 'D') paPct = 0.0069;
+            } else if (level === '4') {
+                if(pa === 'A') paPct = 0.0069;
+                else if(pa === 'BC') paPct = 0.0054;
+                else if(pa === 'D') paPct = 0.0039;
+            }
+
+            let kenaikanGaji = 0;
+            let info = "";
+            let komponen = []; // Penampung rincian kalkulasi
+
+            // Hitung Kenaikan Upah Berdasarkan Level & Provinsi Terpilih
+            if (level === '1' || level === '2') {
+                if (level === '1' && statusKaryawan === 'C') {
+                    // Level 1 Contract (Hanya penyesuaian ke UMP daerah)
+                    if (gajiLama < UMP) {
+                        kenaikanGaji = UMP - gajiLama;
+                        info = `Penyesuaian ke UMP daerah ${namaProvinsi} (Khusus Level 1 Contract).`;
+                        komponen.push(`Penyesuaian UMP ${namaProvinsi}: ${formatRupiah(kenaikanGaji)}`);
+                    } else {
+                        info = `Gaji sudah di atas/setara UMP daerah ${namaProvinsi}. Karyawan Kontrak (C) tidak mendapat kenaikan tambahan.`;
+                    }
+                } else {
+                    // Level 1 (P) & Level 2
+                    let senioritas = 0;
+                    if(masaKerja >= 1 && masaKerja <= 5) senioritas = 9000 * masaKerja;
+                    else if(masaKerja > 5 && masaKerja <= 10) senioritas = 9500 * masaKerja;
+                    else if(masaKerja > 10 && masaKerja <= 15) senioritas = 10000 * masaKerja;
+                    else if(masaKerja > 15 && masaKerja <= 20) senioritas = 10500 * masaKerja;
+                    else if(masaKerja > 20 && masaKerja <= 25) senioritas = 11000 * masaKerja;
+                    else if(masaKerja > 25 && masaKerja <= 30) senioritas = 11500 * masaKerja;
+                    else if(masaKerja > 30) senioritas = 12000 * masaKerja;
+
+                    if (gajiLama < UMP) {
+                        let basePenyesuaian = UMP + senioritas;
+                        
+                        if (isHO) {
+                            // HO Pengecualian: Hanya UMP & Senioritas, TANPA PA
+                            kenaikanGaji = basePenyesuaian - gajiLama;
+                            info = `Penyesuaian UMP ${namaProvinsi} + Senioritas (Pengecualian HO, tanpa % PA).`;
+                            komponen.push(`Nilai UMP ${namaProvinsi}: ${formatRupiah(UMP)}`);
+                            komponen.push(`Senioritas (${masaKerja} thn): ${formatRupiah(senioritas)}`);
+                        } else {
+                            // Non-HO: UMP + Senioritas + Persentase PA
+                            let tambahanPA = basePenyesuaian * paPct;
+                            let gajiAkhirTarget = basePenyesuaian + tambahanPA;
+                            kenaikanGaji = gajiAkhirTarget - gajiLama;
+                            info = `Penyesuaian (UMP ${namaProvinsi} + Senioritas) & Kenaikan % PA.`;
+                            komponen.push(`Nilai UMP ${namaProvinsi}: ${formatRupiah(UMP)}`);
+                            komponen.push(`Senioritas (${masaKerja} thn): ${formatRupiah(senioritas)}`);
+                            komponen.push(`Nilai PA (${(paPct*100).toFixed(2)}%): ${formatRupiah(tambahanPA)}`);
+                        }
+                    } else {
+                        // Di atas UMP
+                        if (isHO) {
+                            info = "Karyawan HO yang sudah di atas UMP tidak mendapat kenaikan.";
+                        } else {
+                            kenaikanGaji = gajiLama * paPct;
+                            info = `Kenaikan % PA Normal (Gaji saat ini sudah di atas UMP daerah ${namaProvinsi}).`;
+                            komponen.push(`Kenaikan PA (${(paPct*100).toFixed(2)}%): ${formatRupiah(kenaikanGaji)}`);
+                        }
+                    }
+                }
+            } else if (level === '3' || level === '4') {
+                if (isHO) {
+                    info = "Karyawan HO Level 3-4 tidak mendapat kenaikan upah.";
+                } else {
+                    if (gajiLama < rentangMin) {
+                        let tambahanPA = rentangMin * paPct;
+                        let targetGaji = rentangMin + tambahanPA;
+                        kenaikanGaji = targetGaji - gajiLama;
+                        info = "Disesuaikan ke Rentang Minimum + Kenaikan % PA.";
+                        komponen.push(`Penyesuaian ke Rentang Min: ${formatRupiah(rentangMin - gajiLama)}`);
+                        komponen.push(`Nilai PA (${(paPct*100).toFixed(2)}%): ${formatRupiah(tambahanPA)}`);
+                    } else {
+                        kenaikanGaji = gajiLama * paPct;
+                        info = "Kenaikan % PA Normal (Gaji di atas Rentang Minimum).";
+                        komponen.push(`Kenaikan PA (${(paPct*100).toFixed(2)}%): ${formatRupiah(kenaikanGaji)}`);
+                    }
+                }
+            }
+
+            // Pastikan kenaikan tidak negatif
+            if (kenaikanGaji < 0) kenaikanGaji = 0;
+
+            let gajiBaru = gajiLama + kenaikanGaji;
+            
+            // Hitung Rapel
+            let rapelGajiPokok = kenaikanGaji * 7; 
+            let rapelTransport = transport * 6;
+            let totalRapel = rapelGajiPokok + rapelTransport;
+
+            // Render Output
+            let htmlKomponen = '';
+            if (komponen.length > 0 && kenaikanGaji > 0) {
+                htmlKomponen = `<div class="bg-slate-800/50 p-3 rounded-lg mt-2 text-xs text-slate-300 border border-slate-700">
+                    <p class="font-semibold text-emerald-500 mb-1">Rincian Kalkulasi:</p>
+                    <ul class="list-disc pl-4 space-y-1">
+                        ${komponen.map(k => `<li>${k}</li>`).join('')}
+                    </ul>
+                </div>`;
+            }
 
             rinDiv.innerHTML = `
-                <div class="flex justify-between"><span>Status:</span><span class="font-bold">${info}</span></div>
-                <div class="flex justify-between"><span>Gaji Baru:</span><span class="font-bold">${formatRupiah(totalGajiBaru)}</span></div>
-                <div class="flex justify-between text-emerald-400"><span>Adjustment Transport:</span><span>+${formatRupiah(transport)}</span></div>
-                <div class="border-t border-emerald-500/20 pt-2 mt-2">
-                    <p class="text-xs text-slate-400 italic">Estimasi Rapel (Jan-Jun + THR):</p>
-                    <p class="text-xl font-bold text-emerald-300">${formatRupiah(totalRapel)}</p>
+                <div class="flex justify-between items-start py-2 border-b border-slate-700">
+                    <span class="text-slate-400 w-1/3">Status Analisa:</span>
+                    <span class="font-semibold text-emerald-300 text-right w-2/3">${info}</span>
+                </div>
+                ${htmlKomponen}
+                <div class="flex justify-between items-center py-2 border-b border-slate-700 mt-2">
+                    <span class="text-slate-400">Gaji Pokok Lama:</span>
+                    <span class="text-white">${formatRupiah(gajiLama)}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-slate-700">
+                    <span class="text-slate-400">Kenaikan Gaji Pokok:</span>
+                    <span class="text-emerald-400 font-bold">+${formatRupiah(kenaikanGaji)}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-slate-700 bg-emerald-900/20 -mx-2 px-2 rounded">
+                    <span class="font-bold text-white">Gaji Pokok Baru:</span>
+                    <span class="font-bold text-emerald-400 text-lg">${formatRupiah(gajiBaru)}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-slate-700">
+                    <span class="text-slate-400">Tunjangan Transport (Ditambah):</span>
+                    <span class="text-emerald-400">+${formatRupiah(transport)} /Bulan</span>
+                </div>
+                
+                <div class="mt-5 pt-4 border-t-2 border-dashed border-emerald-700/50">
+                    <div class="flex justify-between items-end mb-1">
+                        <div>
+                            <p class="text-xs text-slate-400">Estimasi Rapel yang ditransfer (s/d Juni 2026)</p>
+                            <p class="text-[10px] text-slate-500 italic">Rumus: (Kenaikan Gaji x 7) + (Transport x 6)</p>
+                        </div>
+                        <p class="text-2xl font-bold text-emerald-300">${formatRupiah(totalRapel)}</p>
+                    </div>
                 </div>
             `;
         }
