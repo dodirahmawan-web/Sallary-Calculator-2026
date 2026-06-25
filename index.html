@@ -82,7 +82,7 @@
             <div class="md:col-span-2" id="divProvinsi">
                 <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Pilih Provinsi / Wilayah</label>
                 <select id="provinsi" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600 text-white focus:ring-2 focus:ring-emerald-500 outline-none">
-                    <option value="5729876" selected>DKI Jakarta (Rp 5.729.876)</option>
+                    <option value="5729876" selected>DKI Jakarta (Rp 5.729.876 - Khusus Simulasi)</option>
                     <option value="3460672">Aceh (Rp 3.460.672)</option>
                     <option value="2809915">Sumatera Utara (Rp 2.809.915)</option>
                     <option value="2811500">Sumatera Barat (Rp 2.811.500)</option>
@@ -321,17 +321,22 @@
                     else if(masaKerja > 25 && masaKerja <= 30) senioritas = 11500 * masaKerja;
                     else if(masaKerja > 30) senioritas = 12000 * masaKerja;
 
-                    if (gajiLama < UMP) {
-                        let basePenyesuaian = UMP + senioritas;
-                        
-                        if (isHO) {
-                            // HO Pengecualian: Hanya UMP & Senioritas, TANPA PA
-                            kenaikanGaji = basePenyesuaian - gajiLama;
-                            info = `Penyesuaian UMP ${namaProvinsi} + Senioritas (Pengecualian HO, tanpa % PA).`;
+                    if (isHO) {
+                        // Aturan Khusus HO Level 1-2 (Sesuai Poin 4: UMP + Senioritas)
+                        let targetGajiHO = UMP + senioritas;
+                        if (gajiLama < targetGajiHO) {
+                            kenaikanGaji = targetGajiHO - gajiLama;
+                            info = `Penyesuaian ke UMP ${namaProvinsi} + Senioritas (Karyawan HO).`;
+                            komponen.push(`Target UMP + Senioritas: ${formatRupiah(targetGajiHO)}`);
                             komponen.push(`Nilai UMP ${namaProvinsi}: ${formatRupiah(UMP)}`);
                             komponen.push(`Senioritas (${masaKerja} thn): ${formatRupiah(senioritas)}`);
                         } else {
-                            // Non-HO: UMP + Senioritas + Persentase PA
+                            info = `Karyawan HO: Gaji saat ini sudah memenuhi standar (>= UMP + Senioritas).`;
+                        }
+                    } else {
+                        // Non-HO
+                        if (gajiLama < UMP) {
+                            let basePenyesuaian = UMP + senioritas;
                             let tambahanPA = basePenyesuaian * paPct;
                             let gajiAkhirTarget = basePenyesuaian + tambahanPA;
                             kenaikanGaji = gajiAkhirTarget - gajiLama;
@@ -339,14 +344,10 @@
                             komponen.push(`Nilai UMP ${namaProvinsi}: ${formatRupiah(UMP)}`);
                             komponen.push(`Senioritas (${masaKerja} thn): ${formatRupiah(senioritas)}`);
                             komponen.push(`Nilai PA (${(paPct*100).toFixed(2)}%): ${formatRupiah(tambahanPA)}`);
-                        }
-                    } else {
-                        // Di atas UMP
-                        if (isHO) {
-                            info = "Karyawan HO yang sudah di atas UMP tidak mendapat kenaikan.";
                         } else {
+                            // Di atas UMP
                             kenaikanGaji = gajiLama * paPct;
-                            info = `Kenaikan % PA Normal (Gaji saat ini sudah di atas UMP daerah ${namaProvinsi}).`;
+                            info = `Kenaikan % PA Normal (Gaji saat ini sudah >= UMP daerah ${namaProvinsi}).`;
                             komponen.push(`Kenaikan PA (${(paPct*100).toFixed(2)}%): ${formatRupiah(kenaikanGaji)}`);
                         }
                     }
@@ -415,11 +416,17 @@
                 </div>
                 
                 <div class="mt-5 pt-4 border-t-2 border-dashed border-emerald-700/50">
-                    <div class="flex justify-between items-end mb-1">
-                        <div>
-                            <p class="text-xs text-slate-400">Estimasi Rapel yang ditransfer (s/d Juni 2026)</p>
-                            <p class="text-[10px] text-slate-500 italic">Rumus: (Kenaikan Gaji x 7) + (Transport x 6)</p>
-                        </div>
+                    <p class="text-sm font-semibold text-emerald-400 mb-3">Rincian Estimasi Rapel (s/d Juni 2026)</p>
+                    <div class="flex justify-between items-center py-1">
+                        <span class="text-xs text-slate-400">Rapel Kenaikan Gaji Pokok (7x):</span>
+                        <span class="text-sm text-white">${formatRupiah(rapelGajiPokok)}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 mb-2 border-b border-slate-700 pb-3">
+                        <span class="text-xs text-slate-400">Rapel Transport (6x):</span>
+                        <span class="text-sm text-white">${formatRupiah(rapelTransport)}</span>
+                    </div>
+                    <div class="flex justify-between items-end mt-2">
+                        <span class="text-sm font-bold text-white">Total Rapel Diterima:</span>
                         <p class="text-2xl font-bold text-emerald-300">${formatRupiah(totalRapel)}</p>
                     </div>
                 </div>
